@@ -1,0 +1,67 @@
+@startuml
+title Real-Time Quiz Application Architecture
+
+actor User as Client
+participant "FastAPI Server" as Server
+database "PostgreSQL Database" as DB
+
+== User Registration ==
+Client -> Server: POST /auth/register\n(username, password)
+Server -> Server: Validate input
+Server -> DB: Insert new user
+DB --> Server: Success/Error
+Server --> Client: Registration Success/Error
+
+== User Login ==
+Client -> Server: POST /auth/login\n(username, password)
+Server -> DB: Query user credentials
+DB --> Server: User data / None
+Server -> Server: Validate credentials
+Server --> Client: JWT Token / Error
+
+== Create Quiz ==
+Client -> Server: POST /quiz/\n(auth token, quiz details)
+Server -> Server: Authenticate user
+Server -> Server: Create Quiz via QuizService
+Server -> DB: Insert new quiz
+DB --> Server: Quiz created
+Server --> Client: Quiz ID / Error
+
+== Add Questions ==
+Client -> Server: POST /quiz/{quiz_id}/questions\n(auth token, question details)
+Server -> Server: Authenticate user
+Server -> Server: Add Question via QuizService
+Server -> DB: Insert new question
+DB --> Server: Question added
+Server --> Client: Question details / Error
+
+== Join Quiz via WebSocket ==
+Client -> Server: WebSocket Connection to /ws/{quiz_id}
+activate Server
+Server -> Server: Authenticate WebSocket connection
+Server -> Server: Add connection to ConnectionManager
+deactivate Server
+Client --> Server: {"action": "join", "user_id": X}
+
+== Submit Answer via WebSocket ==
+Client -> Server: {"action": "submit_answer", "user_id": X, "question_id": Y, "selected_option": Z}
+activate Server
+Server -> Server: Process answer via QuizService
+Server -> DB: Update participant score
+DB --> Server: Score updated
+Server -> Server: Retrieve updated leaderboard
+Server -> Server: Broadcast Leaderboard via ConnectionManager
+Server --> Client: {"type": "leaderboard_update", "data": {...}}
+Server --> Client: {"type": "answer_result", "data": {...}}
+deactivate Server
+
+== Receive Leaderboard Updates ==
+Server -> Client: {"type": "leaderboard_update", "data": {...}}
+
+== Disconnect WebSocket ==
+Client -> Server: WebSocket Disconnect
+Server -> Server: Remove connection from ConnectionManager
+Server -> Server: Broadcast updated leaderboard
+Server -> Client: {"type": "leaderboard_update", "data": {...}}
+
+@enduml
