@@ -64,6 +64,6 @@ async def login_for_access_token(
             {"access_token": access_token, "token_type": "bearer"},
         )
     except UserNotFoundException:
-        return format_response("error", str(e.detail))
+        return format_response("error", "user not found")
     except InvalidCredentialsException:
         return format_response("error", "Invalid credentials.")
