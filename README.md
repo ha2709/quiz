@@ -1,3 +1,25 @@
+# Real-Time Quiz Application
+
+This project is a real-time quiz application built using FastAPI, WebSocket, and PostgreSQL to deliver scalable and high-performance functionality for users.
+
+## Architecture
+
+Below is the architecture diagram illustrating how the system components interact:
+
+![System Architecture](out/architect/architect.png)
+
+## Features
+
+- Real-time leaderboard updates using WebSocket.
+- Modular and scalable architecture using design patterns.
+- PostgreSQL for reliable and efficient data handling.
+
+## Technologies Used
+
+- **FastAPI**: For building REST APIs and WebSocket connections.
+- **PostgreSQL**: To handle persistent data storage.
+- **Docker**: For containerized deployment.
+
 # Real-Time Vocabulary Quiz Coding Challenge
 
 ## Overview

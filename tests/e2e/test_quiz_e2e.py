@@ -1,9 +1,9 @@
 import asyncio
 import os
+import random
 import sys
 
 import pytest
-from asgi_lifespan import LifespanManager
 from dotenv import load_dotenv
 from httpx import AsyncClient
 from websockets import connect
@@ -51,28 +51,35 @@ async def test_full_quiz_flow(test_app):
     )
     print(48, res.json())
     assert res.status_code == 200
-    token = res.json().get("access_token")
+    token = res.json().get("data").get("access_token")
     print(55, token)
     # Create quiz
-    # headers = {"Authorization": f"Bearer {token}"}
-    # res = await test_app.post("quiz/", headers=headers, params={"quiz_id": "213"})
-    # assert res.status_code == 200
-    # quiz_id = res.json()["quiz_id"]
+    headers = {"accept": "application/json", "Authorization": f"Bearer {token}"}
 
+    # Generate a random quiz ID
+    random_quiz_id = str(random.randint(10000, 99999))
+    res = await test_app.post(
+        "quiz/", headers=headers, json={"quiz_id": str(random_quiz_id)}
+    )
+    print(60, res.json())
+    assert res.status_code == 200
+
+    quiz_id = res.json()["data"]["quiz_id"]
+    print(63, quiz_id)
     # Add question
-    # question_payload = {
-    #     "text": "Capital of France?",
-    #     "options": ["Berlin", "Madrid", "Paris", "Rome"],
-    #     "correct_option": 2,
-    # }
-    # res = await test_app.post(
-    #     f"/quiz/{quiz_id}/questions", headers=headers, json=question_payload
-    # )
-    # assert res.status_code == 200
+    question_payload = {
+        "text": "Capital of France?",
+        "options": "Berlin, Madrid, Paris, Rome",
+        "correct_option": 2,
+    }
+    res = await test_app.post(
+        f"/quiz/{quiz_id}/questions", headers=headers, json=question_payload
+    )
+    assert res.status_code == 200
 
     # # Test WebSocket join
-    # uri = f"ws://testserver/ws/{quiz_id}"
-    # async with connect(uri) as websocket:
-    #     await websocket.send('{"action": "join", "user_id": 1}')
-    #     msg = await websocket.recv()
-    #     assert "User 1 joined quiz" in msg
+    uri = f"ws://localhost:8000/ws/{quiz_id}"
+    async with connect(uri) as websocket:
+        await websocket.send('{"action": "join", "user_id": 1}')
+        msg = await websocket.recv()
+        assert "User 1 joined quiz" in msg
