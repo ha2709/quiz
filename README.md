@@ -129,7 +129,7 @@ Components Included
  - WebSocket Server: Facilitates real-time communication.
  - Logger: Centralized logging mechanism.
 
-
+sudo su
 source env/bin/activate
 pip3 freeze > requirements.txt 
 
@@ -146,3 +146,4 @@ locust -f tests/load/locustfile.py --host http://localhost:8000
 
 pytest -s tests/e2e/test_quiz_e2e.py -k test_full_quiz_flow
 
+pytest -s tests/integration/test_quiz_service.py

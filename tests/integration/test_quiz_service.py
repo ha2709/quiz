@@ -18,7 +18,6 @@ print(9, project_root)
 
 from src.models.base import Base
 from src.repositories.quiz_repository import QuizRepository
-from src.schemas.quiz import QuizCreate
 from src.services.quiz_service import QuizService
 
 

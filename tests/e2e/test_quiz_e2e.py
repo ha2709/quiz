@@ -12,6 +12,7 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 # put import here to update the project folder for import
 from src.main import app
+from tests.utils.string import generate_random_string
 
 load_dotenv()
 BASE_URL = os.getenv("BASE_URL")
@@ -30,19 +31,25 @@ async def test_app():
 @pytest.mark.asyncio
 async def test_full_quiz_flow(test_app):
     # Register user
-    # res = await test_app.post(
-    #     "register",
-    #     params={"username": "john1", "password": "secret1"},
-    #     headers=HEADERS,
-    # )
-    # print(33, res)
-    # assert res.status_code == 200
-
-    # Login user
     headers = {
         "accept": "application/json",
         "Content-Type": "application/x-www-form-urlencoded",
     }
+    random_username = generate_random_string()
+    random_password = generate_random_string()
+
+    # Send the request with random username and password
+    res = await test_app.post(
+        "register",
+        params={"username": random_username, "password": random_password},
+        headers=headers,
+    )
+
+    print(33, res)
+    assert res.status_code == 200
+
+    # Login user
+
     res = await test_app.post(
         "auth/token",
         data={"username": "john1", "password": "secret1"},
