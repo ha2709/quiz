@@ -7,12 +7,11 @@ from dotenv import load_dotenv
 from httpx import ASGITransport, AsyncClient
 from websockets import connect
 
-from src.main import app
-
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if project_root not in sys.path:
     sys.path.append(project_root)
-
+# put import here to update the project folder for import
+from src.main import app
 
 load_dotenv()
 BASE_URL = os.getenv("BASE_URL")
