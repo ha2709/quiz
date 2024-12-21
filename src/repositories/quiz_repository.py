@@ -5,7 +5,6 @@ from sqlalchemy.future import select
 
 from src.models import Participant, Question, QuizSession
 from src.schemas.question import QuestionCreate
-from src.schemas.quiz import QuizCreate
 
 
 class QuizRepository:
@@ -14,7 +13,7 @@ class QuizRepository:
 
     async def create_quiz(self, quiz_id: str, creator_id: int) -> QuizSession:
         quiz = QuizSession(quiz_id=quiz_id, creator_user_id=creator_id, status="active")
-        print(17, quiz.creator_user_id)
+
         self.db.add(quiz)
         await self.db.commit()
         await self.db.refresh(quiz)

@@ -1,14 +1,7 @@
 import json
 from typing import Dict, List
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    WebSocket,
-    WebSocketDisconnect,
-    status,
-)
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
 from src.schemas.leaderboard import Leaderboard
 from src.services.quiz_service import QuizService
@@ -68,7 +61,6 @@ async def websocket_endpoint(
 
                 # Process the answer
 
-                # For demonstration, let's assume any selected_option is correct
                 # In practice, fetch the question and verify the answer
 
                 # Update participant's score if the answer is correct

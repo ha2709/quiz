@@ -1,11 +1,7 @@
-from typing import List
-
 from fastapi import APIRouter, Depends
 
-from src.schemas.leaderboard import Leaderboard
-from src.schemas.participant import ParticipantRead
 from src.schemas.question import QuestionCreate
-from src.schemas.quiz import QuizCreate, QuizRead
+from src.schemas.quiz import QuizCreate
 from src.services.quiz_service import QuizService
 from src.utils.auth import get_current_user
 from src.utils.dependencies import get_quiz_service

@@ -1,7 +1,4 @@
-# For instance, if decode_token and user fetching are ready:
 from fastapi import Depends, HTTPException, status
-
-# Use a security scheme or some dependency to provide the token
 from fastapi.security import OAuth2PasswordBearer
 
 from src.services.user_service import UserService

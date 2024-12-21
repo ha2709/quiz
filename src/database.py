@@ -1,11 +1,12 @@
 import os
 
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.models import participant, question, quiz, user
-from src.models.base import Base
+# from src.models import participant, question, quiz, user
+# from src.models.base imposrt Base
 
 # Load environment variables from .env
 load_dotenv()
@@ -26,8 +27,6 @@ async_engine = create_async_engine(
     DATABASE_URL, echo=True, future=True  # Set to False in production
 )
 
-# Create the synchronous engine for Alembic
-from sqlalchemy import create_engine
 
 sync_engine = create_engine(
     DATABASE_URL_SYNC, echo=True, pool_pre_ping=True  # Set to False in production

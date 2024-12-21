@@ -1,26 +1,26 @@
-import asyncio
 import os
 import random
 import sys
 
 import pytest
 from dotenv import load_dotenv
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from websockets import connect
 
-# Add the path to the project's src directory to the system path
-sys.path.append("/home/ha/Downloads/programs/coding-challenges-main/")
 from src.main import app
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 
 load_dotenv()
 BASE_URL = os.getenv("BASE_URL")
 print(14, BASE_URL)
-HEADERS = {"accept": "application/json"}
 
 
 @pytest.fixture
 async def test_app():
-    from httpx import ASGITransport
 
     # Use ASGITransport to connect the AsyncClient to the FastAPI app
     transport = ASGITransport(app=app)
@@ -40,14 +40,14 @@ async def test_full_quiz_flow(test_app):
     # assert res.status_code == 200
 
     # Login user
-    HEADERS = {
+    headers = {
         "accept": "application/json",
         "Content-Type": "application/x-www-form-urlencoded",
     }
     res = await test_app.post(
         "auth/token",
         data={"username": "john1", "password": "secret1"},
-        headers=HEADERS,
+        headers=headers,
     )
     print(48, res.json())
     assert res.status_code == 200

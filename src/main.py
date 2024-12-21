@@ -72,7 +72,6 @@ async def create_tables():
 @app.on_event("startup")
 async def startup_event():
     try:
-        # Uncomment if you need to create tables on startup
         # await create_tables()
         logger_instance.info("Initialize application")
         # Any additional startup tasks can be added here

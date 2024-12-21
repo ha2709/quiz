@@ -3,7 +3,6 @@ from typing import List
 from src.models import Participant, Question, QuizSession
 from src.repositories.quiz_repository import QuizRepository
 from src.schemas.question import QuestionCreate
-from src.schemas.quiz import QuizCreate, QuizRead
 from src.utils.exceptions import QuizNotFoundException
 
 

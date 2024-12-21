@@ -42,9 +42,9 @@ async def login(
             "success", "Login successful.", {"id": user.id, "username": user.username}
         )
     except UserNotFoundException as e:
-        return format_response("error", str(e.detail))
+        return format_response("error", "User not found.")
     except InvalidCredentialsException as e:
-        return format_response("error", str(e.detail))
+        format_response("error", "Invalid credentials.")
 
 
 @router.post("/auth/token")

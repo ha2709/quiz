@@ -3,7 +3,6 @@ from typing import List
 from fastapi import WebSocket
 
 from src.observers.base_observer import BaseObserver
-from src.services.quiz_service import QuizService
 
 
 class LeaderboardObserver(BaseObserver):
@@ -21,6 +20,5 @@ class LeaderboardObserver(BaseObserver):
         for connection in self.active_connections:
             await connection.send_json(data)
 
-    def update(self, data: dict):
-        # This method can be expanded if needed
-        pass
+    # def update(self, data: dict):
+    #     pass

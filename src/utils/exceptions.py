@@ -3,6 +3,8 @@ from fastapi.responses import JSONResponse
 
 from src.utils.logger import LoggerSingleton
 
+logger_instance = LoggerSingleton().logger
+
 
 class UserAlreadyExistsException(HTTPException):
     def __init__(self, detail: str = "User already exists."):
@@ -32,9 +34,6 @@ class ParticipantNotFoundException(HTTPException):
 class InvalidAnswerException(HTTPException):
     def __init__(self, detail: str = "Invalid answer submitted."):
         super().__init__(status_code=400, detail=detail)
-
-
-logger_instance = LoggerSingleton().logger
 
 
 async def user_already_exists_handler(
