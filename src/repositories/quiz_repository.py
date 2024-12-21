@@ -12,8 +12,9 @@ class QuizRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create_quiz(self, quiz_in: str, creator_id: int) -> QuizSession:
-        quiz = QuizSession(quiz_id=quiz_in, creator_user_id=creator_id, status="active")
+    async def create_quiz(self, quiz_id: str, creator_id: int) -> QuizSession:
+        quiz = QuizSession(quiz_id=quiz_id, creator_user_id=creator_id, status="active")
+        print(17, quiz.creator_user_id)
         self.db.add(quiz)
         await self.db.commit()
         await self.db.refresh(quiz)
@@ -51,6 +52,7 @@ class QuizRepository:
             .order_by(Participant.score.desc())
         )
         participants = result.scalars().all()
+        # print(55, participants)
         return [{"username": p.user.username, "score": p.score} for p in participants]
 
     async def add_question(self, quiz_id: str, question_in: QuestionCreate) -> Question:

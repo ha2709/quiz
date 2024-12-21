@@ -109,6 +109,7 @@ Components Included
 
 
 source env/bin/activate
+pip3 freeze > requirements.txt 
 
 alembic upgrade head
 
@@ -120,3 +121,6 @@ docker build -t fastapi-app .
 docker run -p 8000:8000 fastapi-app
 
 locust -f tests/load/locustfile.py --host http://localhost:8000
+
+pytest -s tests/e2e/test_quiz_e2e.py -k test_full_quiz_flow
+

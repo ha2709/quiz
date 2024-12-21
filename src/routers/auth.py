@@ -48,6 +48,7 @@ async def login_for_access_token(
 ):
     try:
         user = await user_service.authenticate_user(username, password)
+        print(51, user.username)
         token_payload = {"user_id": user.id, "username": user.username}
         access_token = create_token(token_payload)
         return {"access_token": access_token, "token_type": "bearer"}

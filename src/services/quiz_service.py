@@ -11,8 +11,22 @@ class QuizService:
     def __init__(self, quiz_repository: QuizRepository):
         self.quiz_repository = quiz_repository
 
-    async def create_quiz(self, quiz_in: QuizCreate, creator_id: int) -> QuizSession:
-        return await self.quiz_repository.create_quiz(quiz_in, creator_id)
+    async def create_quiz(self, creator_id: int, quiz_id: str = None):
+        quiz = await self.quiz_repository.create_quiz(
+            quiz_id=quiz_id, creator_id=creator_id
+        )
+        return quiz
+
+    async def add_question_to_quiz(
+        self, quiz_id: str, text: str, options: str, correct_option: int
+    ):
+        # Ensure the quiz exists
+        await self.get_quiz(quiz_id)
+        question = await self.quiz_repository.add_question(
+            quiz_id,
+            QuestionCreate(text=text, options=options, correct_option=correct_option),
+        )
+        return question
 
     async def get_quiz(self, quiz_id: str) -> QuizSession:
         quiz = await self.quiz_repository.get_quiz_by_id(quiz_id)
