@@ -10,7 +10,7 @@ from websockets import connect
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if project_root not in sys.path:
     sys.path.append(project_root)
-# put import here to update the project folder for import
+# put import here to update the project folder for importing
 from src.main import app
 from tests.utils.string import generate_random_string
 
@@ -69,7 +69,7 @@ async def test_full_quiz_flow(test_app):
     )
     print(60, res.json())
     assert res.status_code == 200
-
+    user_id = res.json()["data"]["creator_user_id"]
     quiz_id = res.json()["data"]["quiz_id"]
     print(63, quiz_id)
     # Add question
@@ -84,8 +84,8 @@ async def test_full_quiz_flow(test_app):
     assert res.status_code == 200
 
     # # Test WebSocket join
-    uri = f"ws://localhost:8000/ws/{quiz_id}"
+    uri = f"ws://localhost:8000/ws/{quiz_id}?token={token}"
     async with connect(uri) as websocket:
-        await websocket.send('{"action": "join", "user_id": 1}')
+        await websocket.send('{"action": "join"}')
         msg = await websocket.recv()
-        assert "User 1 joined quiz" in msg
+        assert f"User {user_id} joined quiz" in msg

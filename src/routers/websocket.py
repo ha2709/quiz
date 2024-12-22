@@ -1,11 +1,14 @@
 import json
 from typing import Dict, List
 
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 
 from src.schemas.leaderboard import Leaderboard
 from src.services.quiz_service import QuizService
-from src.utils.dependencies import get_quiz_service
+from src.services.user_service import UserService
+from src.utils.auth import get_current_user_for_ws
+from src.utils.dependencies import get_quiz_service, get_user_service
+from src.utils.exceptions import QuizNotFoundException
 from src.utils.logger import LoggerSingleton
 
 router = APIRouter(
@@ -51,7 +54,22 @@ async def websocket_endpoint(
     websocket: WebSocket,
     quiz_id: str,
     quiz_service: QuizService = Depends(get_quiz_service),
+    user_service: UserService = Depends(get_user_service),
 ):
+    token = websocket.query_params.get("token")
+    if not token:
+        await websocket.close(code=1008, reason="Missing token")
+        logger.warning("WebSocket connection rejected due to missing token.")
+        return
+
+    try:
+        current_user = await get_current_user_for_ws(
+            token=token, user_service=user_service
+        )
+    except HTTPException as e:
+        await websocket.close(code=1008, reason=str(e.detail))
+        logger.warning(f"WebSocket connection rejected: {e.detail}")
+        return
     await manager.connect(quiz_id, websocket)
     try:
         while True:
@@ -64,14 +82,12 @@ async def websocket_endpoint(
                 question_id = message.get("question_id")
                 selected_option = message.get("selected_option")
 
-                # Process the answer
-
-                # In practice, fetch the question and verify the answer
+                # Process the answer, fetch the question and verify the answer
 
                 # Update participant's score if the answer is correct
                 try:
                     participant = await quiz_service.update_score(
-                        quiz_id=quiz_id, user_id=user_id, score_increment=1
+                        quiz_id=quiz_id, user_id=user_id, increment=1
                     )
                     logger.info(f"Score updated for user {user_id} in quiz {quiz_id}")
                 except ValueError as e:
@@ -105,10 +121,31 @@ async def websocket_endpoint(
 
             elif action == "join":
                 # Handle participant joining the quiz
-                user_id = message.get("user_id")
-                logger.info(f"User {user_id} joined quiz {quiz_id}")
 
-                # For now, simply acknowledge the join
+                user_id = current_user.id
+                logger.info(f"User {user_id} joined quiz {quiz_id}")
+                # Validate the quiz exists
+                try:
+                    await quiz_service.get_quiz(quiz_id)
+                except QuizNotFoundException:
+                    error_message = f"Quiz {quiz_id} does not exist."
+                    logger.warning(error_message)
+                    await websocket.send_text(
+                        json.dumps({"type": "error", "message": error_message})
+                    )
+                    return
+
+                # Optionally, validate the user exists
+
+                if not await user_service.get_user_by_id(user_id):
+                    error_message = f"User {user_id} does not exist."
+                    logger.warning(error_message)
+                    await websocket.send_text(
+                        json.dumps({"type": "error", "message": error_message})
+                    )
+                    return
+
+                logger.info(f"User {user_id} successfully joined quiz {quiz_id}")
                 await websocket.send_text(
                     json.dumps(
                         {

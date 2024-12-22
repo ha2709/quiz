@@ -13,8 +13,8 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-print(9, project_root)
-# put import here to update the project folder for import
+# print(9, project_root)
+# put import here to update the project folder for importing
 
 from src.models.base import Base
 from src.repositories.quiz_repository import QuizRepository

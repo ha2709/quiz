@@ -9,20 +9,20 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
 
 def decode_token(token: str) -> dict:
-    # try:
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    user_id = payload.get("user_id")
-    username = payload.get("username")
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+        username = payload.get("username")
 
-    if user_id is None or username is None:
-        raise ValueError("Token payload does not contain user_id or username.")
+        if user_id is None or username is None:
+            raise ValueError("Token payload does not contain user_id or username.")
 
-    return {"user_id": user_id, "username": username}
+        return {"user_id": user_id, "username": username}
 
-    # except ExpiredSignatureError:
-    #     raise ValueError("Token has expired.")
-    # except InvalidTokenError as e:
-    #     raise ValueError(f"Invalid token: {e}")
+    except jwt.ExpiredSignatureError:
+        raise ValueError("Token has expired.")
+    except jwt.InvalidTokenError as e:
+        raise ValueError(f"Invalid token: {e}")
 
 
 def create_token(payload: dict) -> str:

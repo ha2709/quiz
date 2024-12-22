@@ -9,7 +9,7 @@ const QuizConnection = ({ token, onConnected }) => {
       return;
     }
 
-    const ws = new WebSocket(`ws://localhost:8000/ws/${quizId}`);
+    const ws = new WebSocket(`ws://localhost:8000/ws/${quizId}?token=${token}`);
     ws.onopen = () => {
       console.log("Connected to WebSocket");
       ws.send(
