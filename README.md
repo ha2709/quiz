@@ -67,36 +67,59 @@ Components Included
 
 ``` source env/bin/activate ``` 
 
+### 3. Install dependencies
+
+` pip install -r requirements.txt `
 
 pip3 freeze > requirements.txt 
 
-4. Apply Database Migrations
+### 4. Apply Database Migrations
+
+Please configuration PostgreSQL and then update in the .env for `DATABASE_URL`
+
+Migration :
+    
+    - Check the URL in env and alembic.ini
+    - run the revision command in terminal
+    - Review the file in.
+    - run the migrate command.
+
+` alembic revision --autogenerate -m "create_tables"`
 
 Run Alembic to apply migrations:
 
-alembic upgrade head
+ `alembic upgrade head`
 
-uvicorn src.main:app --reload
+### 5 Run the app 
 
-3. Run the Docker Container
+`uvicorn src.main:app --reload`
+
+#### 6. Run the Docker Container
+
+Build the container
+
+`docker build -t fastapi-app .`
+
 Start the application using Docker:
-docker build -t fastapi-app .
 
-docker run -p 8000:8000 fastapi-app
-Testing
+`docker run -p 8000:8000 fastapi-app`
+
+## Testing
+
 1. Load Testing with Locust
+
 Run Locust to perform load testing on the application:
 
-locust -f tests/load/locustfile.py --host http://localhost:8000
+`locust -f tests/load/locustfile.py --host http://localhost:8000`
 
 2. End-to-End Testing
 
 Run end-to-end tests using pytest:
 
-pytest -s tests/e2e/test_quiz_e2e.py -k test_full_quiz_flow
+`pytest -s tests/e2e/test_quiz_e2e.py -k test_full_quiz_flow`
 
 3. Integration Testing
 
 Run integration tests for the Quiz Service:
 
-pytest -s tests/integration/test_quiz_service.py
+`pytest -s tests/integration/test_quiz_service.py`
