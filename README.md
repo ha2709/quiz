@@ -8,6 +8,9 @@ Below is the architecture diagram illustrating how the system components interac
 
 ![System Architecture](out/architect/architect.png)
 
+[System Documentation](https://docs.google.com/document/d/19Uj6JK1CztKAqq5PRGJdjRt9cgD_hQrlpujiPjtoQAA/edit?usp=sharing)
+
+
 ## Features
 
 - Real-time leaderboard updates using WebSocket.
@@ -123,3 +126,5 @@ Run end-to-end tests using pytest:
 Run integration tests for the Quiz Service:
 
 `pytest -s tests/integration/test_quiz_service.py`
+
+
