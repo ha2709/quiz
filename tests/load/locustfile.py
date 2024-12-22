@@ -7,7 +7,6 @@ from locust import HttpUser, between, task
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if project_root not in sys.path:
     sys.path.append(project_root)
-from tests.e2e.test_quiz_e2e import test_app
 from tests.utils.string import generate_random_string
 
 
@@ -32,18 +31,18 @@ class QuizUser(HttpUser):
             params={"username": random_username, "password": random_password},
             headers=headers,
         )
-        print(
-            35,
-            register_response.json(),
-            register_response.status_code,
-            type(register_response.status_code),
-            register_response.status_code != 200,
-        )
         if register_response.status_code != 200:
             print(f"Failed to register user: {random_username}")
+            print(f"Response: {register_response.text}")
             return
 
-        print(f"User registered: {random_username}")
+        try:
+            register_data = register_response.json()
+            print(f"User registered: {random_username}")
+        except Exception as e:
+            print(f"Error parsing register response: {e}")
+            print(f"Response content: {register_response.text}")
+            return
 
         # Step 2: Login the user to get a token
         login_response = self.client.post(
@@ -51,24 +50,27 @@ class QuizUser(HttpUser):
             data={"username": random_username, "password": random_password},
             headers=headers,
         )
-        print(54, login_response.status_code)
         if login_response.status_code != 200:
             print(f"Failed to login user: {random_username}")
+            print(f"Response: {login_response.text}")
             return
 
-        token = login_response.json().get("data", {}).get("access_token")
-        if not token:
-            print("Failed to retrieve token")
+        try:
+            login_data = login_response.json()
+            token = login_data.get("data", {}).get("access_token")
+            if not token:
+                print("Failed to retrieve token from login response")
+                return
+            print(f"User logged in: {random_username}")
+        except Exception as e:
+            print(f"Error parsing login response: {e}")
+            print(f"Response content: {login_response.text}")
             return
 
-        print(f"User logged in: {random_username}")
         auth_headers = {
             "accept": "application/json",
             "Authorization": f"Bearer {token}",
         }
-
-        # Add authorization header
-        # auth_headers = {**headers, "Authorization": f"Bearer {token}"}
 
         # Step 3: Create a new quiz
         random_quiz_id = str(random.randint(10000, 99999))
@@ -77,17 +79,22 @@ class QuizUser(HttpUser):
             json={"quiz_id": random_quiz_id},
             headers=auth_headers,
         )
-        print(76, create_quiz_response.json())
         if create_quiz_response.status_code != 200:
             print(f"Failed to create quiz for user: {random_username}")
+            print(f"Response: {create_quiz_response.text}")
             return
 
-        quiz_id = create_quiz_response.json().get("data", {}).get("quiz_id")
-        if not quiz_id:
-            print("Failed to retrieve quiz ID")
+        try:
+            quiz_data = create_quiz_response.json()
+            quiz_id = quiz_data.get("data", {}).get("quiz_id")
+            if not quiz_id:
+                print("Failed to retrieve quiz ID")
+                return
+            print(f"Quiz created: {quiz_id}")
+        except Exception as e:
+            print(f"Error parsing quiz creation response: {e}")
+            print(f"Response content: {create_quiz_response.text}")
             return
-
-        print(f"Quiz created: {quiz_id}")
 
         # Step 4: Add a participant to the quiz
         add_participant_response = self.client.post(
@@ -100,3 +107,4 @@ class QuizUser(HttpUser):
             print(f"Participant added to quiz {quiz_id}")
         else:
             print(f"Failed to add participant to quiz {quiz_id}")
+            print(f"Response: {add_participant_response.text}")
